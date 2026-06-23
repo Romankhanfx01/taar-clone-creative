@@ -80,7 +80,7 @@ function ProductPage() {
             <p className="text-foreground/80 leading-relaxed mb-8">{product.description}</p>
 
             <div className="mb-8 grid grid-cols-2 gap-3">
-              {product.specs.map((s) => (
+              {product.specs.map((s: { label: string; value: string }) => (
                 <div key={s.label} className="rounded-lg border border-border bg-card p-4">
                   <p className="text-xs uppercase tracking-widest text-muted-foreground">{s.label}</p>
                   <p className="mt-1 font-medium">{s.value}</p>
