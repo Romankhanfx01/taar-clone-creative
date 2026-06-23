@@ -64,10 +64,9 @@ export function HeroSlider() {
           {s.sub}
         </p>
         <div>
-          {/* @ts-expect-error dynamic link typing */}
           <Link
-            to={s.cta.to}
-            params={(s.cta as { params?: unknown }).params}
+            to={s.cta.to as string}
+            params={(s.cta as { params?: Record<string, string> }).params as never}
             className="inline-flex items-center justify-center rounded-full border-2 border-mint bg-mint/10 px-10 py-4 font-display text-lg tracking-widest text-mint hover:bg-mint hover:text-mint-foreground transition"
           >
             {s.cta.label.toUpperCase()}
