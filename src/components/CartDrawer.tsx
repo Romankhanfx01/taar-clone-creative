@@ -1,9 +1,38 @@
 import { useCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/products";
 import { Minus, Plus, X } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useState } from "react";
+import { createCheckoutSession } from "@/lib/checkout.functions";
 
 export function CartDrawer() {
   const { items, open, setOpen, remove, setQty, subtotal } = useCart();
+  const checkout = useServerFn(createCheckoutSession);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  async function startCheckout() {
+    setErr(null);
+    setLoading(true);
+    try {
+      const res = await checkout({
+        data: {
+          items: items.map((i) => ({
+            slug: i.product.slug,
+            name: i.product.name,
+            price: i.product.price,
+            qty: i.qty,
+            image: i.product.image,
+          })),
+        },
+      });
+      if (res.url) window.location.href = res.url;
+    } catch (e: any) {
+      setErr(e?.message ?? "Checkout failed");
+    } finally {
+      setLoading(false);
+    }
+  }
   return (
     <>
       <div
