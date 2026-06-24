@@ -106,11 +106,13 @@ export function CartDrawer() {
             <span className="font-semibold text-foreground">{formatPrice(subtotal)}</span>
           </div>
           <p className="mb-4 text-xs text-muted-foreground">Taxes and shipping calculated at checkout</p>
+          {err && <p className="mb-3 text-xs text-destructive">{err}</p>}
           <button
-            disabled={items.length === 0}
+            onClick={startCheckout}
+            disabled={items.length === 0 || loading}
             className="w-full rounded-full bg-mint py-4 font-display tracking-widest text-mint-foreground transition hover:opacity-90 disabled:opacity-40"
           >
-            CHECK OUT
+            {loading ? "REDIRECTING…" : "CHECK OUT"}
           </button>
         </footer>
       </aside>
