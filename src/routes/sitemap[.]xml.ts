@@ -1,26 +1,32 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type {} from "@tanstack/react-start";
-import { products, collections } from "@/lib/products";
-
-const BASE_URL = "";
+import { getRequestHost } from "@tanstack/react-start/server";
+import { sitemapData } from "@/lib/products.functions";
 
 export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const entries = [
+        const host = getRequestHost();
+        const base = host ? `https://${host}` : "";
+        const data = await sitemapData();
+
+        const staticPaths = [
           { path: "/", changefreq: "weekly", priority: "1.0" },
           { path: "/shop", changefreq: "weekly", priority: "0.9" },
           { path: "/collections", changefreq: "weekly", priority: "0.8" },
           { path: "/about", changefreq: "monthly", priority: "0.5" },
           { path: "/contact", changefreq: "monthly", priority: "0.5" },
-          ...collections.map((c) => ({ path: `/collections/${c.slug}`, changefreq: "weekly", priority: "0.7" })),
-          ...products.map((p) => ({ path: `/products/${p.slug}`, changefreq: "weekly", priority: "0.7" })),
+        ];
+        const entries = [
+          ...staticPaths,
+          ...data.collections.map((c) => ({ path: `/collections/${c.slug}`, changefreq: "weekly", priority: "0.7" })),
+          ...data.products.map((p) => ({ path: `/products/${p.slug}`, changefreq: "weekly", priority: "0.7" })),
         ];
 
         const urls = entries.map(
           (e) =>
-            `  <url>\n    <loc>${BASE_URL}${e.path}</loc>\n    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`
+            `  <url>\n    <loc>${base}${e.path}</loc>\n    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`,
         );
 
         const xml = [

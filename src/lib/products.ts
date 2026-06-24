@@ -9,6 +9,7 @@ import pCar from "@/assets/product-car.jpg";
 
 export const heroImages = [hero, bannerCharger, bannerCable];
 
+export type Spec = { label: string; value: string };
 export type Product = {
   slug: string;
   name: string;
@@ -16,13 +17,15 @@ export type Product = {
   price: number;
   oldPrice?: number;
   image: string;
-  collection: "chargers" | "cables" | "powerbanks" | "car";
+  collection: string;
   badge?: string;
   description: string;
-  specs: { label: string; value: string }[];
+  specs: Spec[];
 };
 
-export const products: Product[] = [
+export type Collection = { slug: string; name: string; count: number };
+
+export const seedProducts: Product[] = [
   {
     slug: "dot-gan-30w",
     name: "Dot GaN 30W Charger",
@@ -126,11 +129,11 @@ export const products: Product[] = [
   },
 ];
 
-export const collections = [
-  { slug: "chargers", name: "Chargers", count: products.filter((p) => p.collection === "chargers").length },
-  { slug: "cables", name: "Cables", count: products.filter((p) => p.collection === "cables").length },
-  { slug: "powerbanks", name: "Power Banks", count: products.filter((p) => p.collection === "powerbanks").length },
-  { slug: "car", name: "Car Accessories", count: products.filter((p) => p.collection === "car").length },
+export const seedCollections: Collection[] = [
+  { slug: "chargers", name: "Chargers", count: seedProducts.filter((p) => p.collection === "chargers").length },
+  { slug: "cables", name: "Cables", count: seedProducts.filter((p) => p.collection === "cables").length },
+  { slug: "powerbanks", name: "Power Banks", count: seedProducts.filter((p) => p.collection === "powerbanks").length },
+  { slug: "car", name: "Car Accessories", count: seedProducts.filter((p) => p.collection === "car").length },
 ];
 
 export const formatPrice = (n: number) =>

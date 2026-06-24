@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "./Logo";
@@ -15,6 +15,7 @@ const links = [
 export function Header() {
   const { count, setOpen } = useCart();
   const [mobile, setMobile] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-xl">
@@ -40,12 +41,12 @@ export function Header() {
           ))}
         </nav>
         <div className="flex items-center gap-4">
-          <button aria-label="Search" className="text-foreground/80 hover:text-mint transition">
+          <button aria-label="Search" onClick={() => navigate({ to: "/search", search: { q: "" } })} className="text-foreground/80 hover:text-mint transition">
             <Search className="h-5 w-5" />
           </button>
-          <button aria-label="Account" className="hidden sm:inline text-foreground/80 hover:text-mint transition">
+          <Link to="/admin" aria-label="Admin" className="hidden sm:inline text-foreground/80 hover:text-mint transition">
             <User className="h-5 w-5" />
-          </button>
+          </Link>
           <button
             aria-label="Cart"
             onClick={() => setOpen(true)}

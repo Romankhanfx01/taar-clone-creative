@@ -1,20 +1,25 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
 import { ProductCard } from "@/components/ProductCard";
-import { products } from "@/lib/products";
+import { listProducts } from "@/lib/products.functions";
+
+const qo = queryOptions({ queryKey: ["products"], queryFn: () => listProducts({ data: {} }) });
 
 export const Route = createFileRoute("/shop")({
+  loader: ({ context }) => context.queryClient.ensureQueryData(qo),
   head: () => ({
     meta: [
-      { title: "Shop — VoltDot" },
-      { name: "description", content: "Browse all VoltDot chargers, cables, power banks and accessories." },
-      { property: "og:title", content: "Shop — VoltDot" },
-      { property: "og:description", content: "Browse all VoltDot products in one place." },
+      { title: "Shop All — VoltDot" },
+      { name: "description", content: "Browse every VoltDot product: GaN chargers, braided cables, power banks and car accessories." },
+      { property: "og:title", content: "Shop All — VoltDot" },
+      { property: "og:description", content: "Browse every VoltDot product in one place." },
     ],
   }),
   component: Shop,
 });
 
 function Shop() {
+  const { data: products } = useSuspenseQuery(qo);
   return (
     <div className="mx-auto max-w-7xl px-6 py-16 lg:px-12">
       <div className="mb-12">
@@ -23,9 +28,7 @@ function Shop() {
         <p className="mt-3 text-muted-foreground">{products.length} products</p>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {products.map((p) => (
-          <ProductCard key={p.slug} product={p} />
-        ))}
+        {products.map((p) => <ProductCard key={p.slug} product={p} />)}
       </div>
     </div>
   );
