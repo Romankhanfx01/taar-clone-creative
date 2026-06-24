@@ -83,13 +83,15 @@ const productInput = z.object({
 
 export const adminSaveProduct = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => productInput.parse(d))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<{ ok: true }> => {
     const token = getCookie(COOKIE);
     const cookie = token ? `${COOKIE}=${token}` : undefined;
     if (data.id) {
-      return api(`/admin/products/${data.id}`, { method: "PATCH", body: data, admin: true, cookie });
+      await api(`/admin/products/${data.id}`, { method: "PATCH", body: data, admin: true, cookie });
+    } else {
+      await api("/admin/products", { method: "POST", body: data, admin: true, cookie });
     }
-    return api("/admin/products", { method: "POST", body: data, admin: true, cookie });
+    return { ok: true };
   });
 
 export const adminDeleteProduct = createServerFn({ method: "POST" })
