@@ -15,6 +15,7 @@ const links = [
 
 export function Header() {
   const { count, setOpen } = useCart();
+  const { count: wishCount } = useWishlist();
   const [mobile, setMobile] = useState(false);
   const navigate = useNavigate();
 
