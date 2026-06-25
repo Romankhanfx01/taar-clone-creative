@@ -53,6 +53,7 @@ function Index() {
     <div>
       <HeroSlider />
       <Marquee items={["FREE SHIPPING OVER RS. 5,000","12-MONTH WARRANTY","GaN III TECHNOLOGY","7-DAY RETURNS","MADE FOR EVERYDAY"]} />
+      <TrustBadges />
 
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
