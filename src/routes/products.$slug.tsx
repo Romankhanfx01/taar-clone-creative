@@ -1,15 +1,20 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { useState } from "react";
-import { Minus, Plus, ShieldCheck, Truck, Zap } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Minus, Plus, ShieldCheck, Truck, Zap, Heart, Share2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { formatPrice } from "@/lib/products";
 import { useCart } from "@/lib/cart";
+import { useWishlist } from "@/lib/wishlist";
 import { ProductCard } from "@/components/ProductCard";
 import { getProduct, listProducts } from "@/lib/products.functions";
+import { createCheckoutSession } from "@/lib/checkout.functions";
 
 const productQO = (slug: string) =>
   queryOptions({ queryKey: ["product", slug], queryFn: () => getProduct({ data: { slug } }) });
 const allQO = queryOptions({ queryKey: ["products"], queryFn: () => listProducts({ data: {} }) });
+
+const RV_KEY = "voltdot.recentlyViewed.v1";
 
 export const Route = createFileRoute("/products/$slug")({
   loader: async ({ params, context }) => {
@@ -70,14 +75,70 @@ function ProductPage() {
   const { slug } = Route.useParams();
   const { data: product } = useSuspenseQuery(productQO(slug));
   const { data: all } = useSuspenseQuery(allQO);
-  const { add } = useCart();
+  const { add, setOpen } = useCart();
+  const { has, toggle } = useWishlist();
+  const checkout = useServerFn(createCheckoutSession);
   const [qty, setQty] = useState(1);
+  const [activeImg, setActiveImg] = useState(0);
+  const [buying, setBuying] = useState(false);
+
+  // Recently viewed tracking
+  useEffect(() => {
+    if (!product) return;
+    try {
+      const raw = localStorage.getItem(RV_KEY);
+      const list: string[] = raw ? JSON.parse(raw) : [];
+      const next = [product.slug, ...list.filter((s) => s !== product.slug)].slice(0, 8);
+      localStorage.setItem(RV_KEY, JSON.stringify(next));
+    } catch {}
+  }, [product?.slug]);
 
   if (!product) return null;
-  const related = all.filter((p) => p.collection === product.collection && p.slug !== product.slug).slice(0, 3);
+
+  const wished = has(product.slug);
+  const images = [product.image, product.image, product.image]; // gallery placeholder using single image
+  const related = all.filter((p) => p.collection === product.collection && p.slug !== product.slug).slice(0, 4);
+
+  // Recently viewed (excluding current)
+  let recentlyViewed: typeof all = [];
+  if (typeof window !== "undefined") {
+    try {
+      const raw = localStorage.getItem(RV_KEY);
+      const list: string[] = raw ? JSON.parse(raw) : [];
+      recentlyViewed = list
+        .filter((s) => s !== product.slug)
+        .map((s) => all.find((p) => p.slug === s))
+        .filter((p): p is NonNullable<typeof p> => !!p)
+        .slice(0, 4);
+    } catch {}
+  }
+
+  async function buyNow() {
+    setBuying(true);
+    try {
+      const res = await checkout({
+        data: { items: [{ slug: product!.slug, name: product!.name, price: product!.price, qty, image: product!.image }] },
+      });
+      if (res.url) window.location.href = res.url;
+    } catch {
+      add(product!, qty);
+      setOpen(true);
+    } finally {
+      setBuying(false);
+    }
+  }
+
+  async function share() {
+    const url = typeof window !== "undefined" ? window.location.href : "";
+    if (navigator.share) {
+      try { await navigator.share({ title: product!.name, text: product!.tagline, url }); } catch {}
+    } else if (navigator.clipboard) {
+      await navigator.clipboard.writeText(url);
+    }
+  }
 
   return (
-    <div>
+    <div className="pb-28 lg:pb-0">
       <div className="mx-auto max-w-7xl px-6 py-12 lg:px-12">
         <nav className="mb-8 text-sm text-muted-foreground" aria-label="Breadcrumb">
           <Link to="/" className="hover:text-mint">Home</Link>
@@ -88,11 +149,25 @@ function ProductPage() {
         </nav>
 
         <div className="grid gap-12 lg:grid-cols-2">
-          <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-card">
-            {product.badge && (
-              <span className="absolute left-5 top-5 rounded-full bg-mint px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-mint-foreground">{product.badge}</span>
-            )}
-            <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+          <div className="flex flex-col gap-4">
+            <div className="relative aspect-square overflow-hidden rounded-2xl border border-border bg-card">
+              {product.badge && (
+                <span className="absolute left-5 top-5 z-10 rounded-full bg-mint px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-mint-foreground">{product.badge}</span>
+              )}
+              <img src={images[activeImg]} alt={product.name} className="h-full w-full object-cover" />
+            </div>
+            <div className="grid grid-cols-4 gap-3">
+              {images.map((src, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveImg(i)}
+                  className={`aspect-square overflow-hidden rounded-lg border-2 bg-card transition ${activeImg === i ? "border-mint" : "border-border hover:border-mint/40"}`}
+                  aria-label={`View image ${i + 1}`}
+                >
+                  <img src={src} alt={`${product.name} ${i + 1}`} className="h-full w-full object-cover" />
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex flex-col">
@@ -103,6 +178,11 @@ function ProductPage() {
             <div className="flex items-end gap-3 mb-8">
               {product.oldPrice && <span className="text-lg text-muted-foreground line-through">{formatPrice(product.oldPrice)}</span>}
               <span className="text-3xl font-semibold text-mint">{formatPrice(product.price)}</span>
+              {product.oldPrice && (
+                <span className="mb-1 rounded-full bg-mint/15 px-2 py-0.5 text-xs font-semibold text-mint">
+                  Save {Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)}%
+                </span>
+              )}
             </div>
 
             <p className="text-foreground/80 leading-relaxed mb-8">{product.description}</p>
@@ -116,13 +196,33 @@ function ProductPage() {
               ))}
             </div>
 
-            <div className="mb-6 flex items-center gap-4">
+            <div className="mb-4 flex items-center gap-4">
               <div className="flex items-center rounded-full border border-border">
                 <button onClick={() => setQty((q) => Math.max(1, q - 1))} className="grid h-12 w-12 place-items-center hover:text-mint" aria-label="Decrease quantity"><Minus className="h-4 w-4" /></button>
                 <span className="w-10 text-center">{qty}</span>
                 <button onClick={() => setQty((q) => q + 1)} className="grid h-12 w-12 place-items-center hover:text-mint" aria-label="Increase quantity"><Plus className="h-4 w-4" /></button>
               </div>
-              <button onClick={() => add(product, qty)} className="flex-1 rounded-full bg-mint py-4 font-display tracking-widest text-mint-foreground hover:opacity-90 transition">ADD TO CART</button>
+              <button onClick={() => add(product, qty)} className="flex-1 rounded-full border-2 border-mint py-3 font-display tracking-widest text-mint hover:bg-mint hover:text-mint-foreground transition">ADD TO CART</button>
+            </div>
+
+            <div className="mb-6 flex gap-3">
+              <button
+                onClick={buyNow}
+                disabled={buying}
+                className="flex-1 rounded-full bg-mint py-4 font-display tracking-widest text-mint-foreground hover:opacity-90 disabled:opacity-50 transition"
+              >
+                {buying ? "REDIRECTING…" : "BUY IT NOW"}
+              </button>
+              <button
+                onClick={() => toggle(product.slug)}
+                aria-label="Save to wishlist"
+                className="grid h-14 w-14 place-items-center rounded-full border border-border hover:border-mint"
+              >
+                <Heart className={`h-5 w-5 ${wished ? "fill-mint text-mint" : ""}`} />
+              </button>
+              <button onClick={share} aria-label="Share" className="grid h-14 w-14 place-items-center rounded-full border border-border hover:border-mint">
+                <Share2 className="h-5 w-5" />
+              </button>
             </div>
 
             <div className="grid grid-cols-3 gap-4 border-t border-border pt-6">
@@ -140,11 +240,36 @@ function ProductPage() {
       {related.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 py-16 lg:px-12">
           <h2 className="font-display text-3xl tracking-wide mb-8">YOU MAY ALSO LIKE</h2>
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {related.map((p) => <ProductCard key={p.slug} product={p} />)}
           </div>
         </section>
       )}
+
+      {recentlyViewed.length > 0 && (
+        <section className="mx-auto max-w-7xl px-6 pb-16 lg:px-12">
+          <h2 className="font-display text-3xl tracking-wide mb-8">RECENTLY VIEWED</h2>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {recentlyViewed.map((p) => <ProductCard key={p.slug} product={p} />)}
+          </div>
+        </section>
+      )}
+
+      {/* Sticky mobile add-to-cart bar */}
+      <div className="fixed bottom-[64px] left-0 right-0 z-30 border-t border-border bg-background/95 p-3 backdrop-blur-xl lg:hidden">
+        <div className="flex items-center gap-3">
+          <div className="flex flex-col">
+            <span className="text-[10px] uppercase tracking-widest text-muted-foreground">Total</span>
+            <span className="text-base font-semibold text-mint">{formatPrice(product.price * qty)}</span>
+          </div>
+          <button onClick={() => add(product, qty)} className="flex-1 rounded-full border border-mint py-3 text-xs font-display tracking-widest text-mint">
+            ADD TO CART
+          </button>
+          <button onClick={buyNow} disabled={buying} className="flex-1 rounded-full bg-mint py-3 text-xs font-display tracking-widest text-mint-foreground disabled:opacity-50">
+            {buying ? "…" : "BUY NOW"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
