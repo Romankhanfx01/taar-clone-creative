@@ -41,8 +41,9 @@ export function Footer() {
             <ul className="flex flex-col gap-2 text-sm text-muted-foreground">
               <li><Link to="/about" className="hover:text-mint">About Us</Link></li>
               <li><Link to="/contact" className="hover:text-mint">Contact</Link></li>
-              <li><a href="#" className="hover:text-mint">Warranty</a></li>
-              <li><a href="#" className="hover:text-mint">Shipping</a></li>
+              <li><Link to="/faq" className="hover:text-mint">FAQ</Link></li>
+              <li><Link to="/policies/shipping" className="hover:text-mint">Shipping</Link></li>
+              <li><Link to="/account" className="hover:text-mint">Track Order</Link></li>
             </ul>
           </div>
 
@@ -68,9 +69,10 @@ export function Footer() {
         <div className="mt-12 flex flex-col gap-4 border-t border-border pt-6 text-xs text-muted-foreground md:flex-row md:justify-between">
           <p>© {new Date().getFullYear()} VoltDot. All rights reserved.</p>
           <div className="flex gap-6">
-            <a href="#" className="hover:text-mint">Privacy</a>
-            <a href="#" className="hover:text-mint">Terms</a>
-            <a href="#" className="hover:text-mint">Refund Policy</a>
+            <Link to="/policies/privacy" className="hover:text-mint">Privacy</Link>
+            <Link to="/policies/terms" className="hover:text-mint">Terms</Link>
+            <Link to="/policies/refund" className="hover:text-mint">Refund Policy</Link>
+            <Link to="/policies/shipping" className="hover:text-mint">Shipping</Link>
           </div>
         </div>
       </div>

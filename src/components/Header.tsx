@@ -44,7 +44,7 @@ export function Header() {
           <button aria-label="Search" onClick={() => navigate({ to: "/search", search: { q: "" } })} className="text-foreground/80 hover:text-mint transition">
             <Search className="h-5 w-5" />
           </button>
-          <Link to="/admin" aria-label="Admin" className="hidden sm:inline text-foreground/80 hover:text-mint transition">
+          <Link to="/account" aria-label="Account" className="hidden sm:inline text-foreground/80 hover:text-mint transition">
             <User className="h-5 w-5" />
           </Link>
           <button
