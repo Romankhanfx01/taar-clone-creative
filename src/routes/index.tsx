@@ -5,6 +5,8 @@ import { ProductCard } from "@/components/ProductCard";
 import { Marquee } from "@/components/Marquee";
 import { FeatureGrid } from "@/components/FeatureGrid";
 import { Reviews } from "@/components/Reviews";
+import { TrustBadges } from "@/components/TrustBadges";
+import { InstagramFeed } from "@/components/InstagramFeed";
 import { listProducts, listCollections } from "@/lib/products.functions";
 import bannerCharger from "@/assets/banner-charger.jpg";
 import bannerCable from "@/assets/banner-cable.jpg";
