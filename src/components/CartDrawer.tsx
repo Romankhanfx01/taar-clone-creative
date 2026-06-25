@@ -1,15 +1,20 @@
 import { useCart } from "@/lib/cart";
 import { formatPrice } from "@/lib/products";
-import { Minus, Plus, X } from "lucide-react";
+import { Minus, Plus, X, Truck } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { createCheckoutSession } from "@/lib/checkout.functions";
+
+const FREE_SHIPPING = 5000;
 
 export function CartDrawer() {
   const { items, open, setOpen, remove, setQty, subtotal } = useCart();
   const checkout = useServerFn(createCheckoutSession);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  const remaining = Math.max(0, FREE_SHIPPING - subtotal);
+  const progress = Math.min(100, (subtotal / FREE_SHIPPING) * 100);
 
   async function startCheckout() {
     setErr(null);
@@ -53,6 +58,27 @@ export function CartDrawer() {
             <X className="h-6 w-6" />
           </button>
         </header>
+
+        {items.length > 0 && (
+          <div className="border-b border-border bg-background/40 px-5 py-4">
+            <div className="mb-2 flex items-center gap-2 text-xs">
+              <Truck className="h-4 w-4 text-mint" />
+              {remaining > 0 ? (
+                <p className="text-muted-foreground">
+                  Add <span className="font-semibold text-foreground">{formatPrice(remaining)}</span> more for <span className="text-mint">FREE shipping</span>
+                </p>
+              ) : (
+                <p className="font-medium text-mint">🎉 You've unlocked FREE shipping!</p>
+              )}
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-border">
+              <div
+                className="h-full rounded-full bg-mint transition-all duration-500"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
