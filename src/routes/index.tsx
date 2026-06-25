@@ -122,6 +122,7 @@ function Index() {
       )}
 
       <Reviews />
+      <InstagramFeed />
     </div>
   );
 }
