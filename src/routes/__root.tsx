@@ -131,15 +131,18 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <AnnouncementBar />
-        <Header />
-        <main className="min-h-[60vh]">
-          <Outlet />
-        </main>
-        <Footer />
-        <CartDrawer />
-      </CartProvider>
+      <WishlistProvider>
+        <CartProvider>
+          <AnnouncementBar />
+          <Header />
+          <main className="min-h-[60vh] pb-16 lg:pb-0">
+            <Outlet />
+          </main>
+          <Footer />
+          <CartDrawer />
+          <MobileBottomNav />
+        </CartProvider>
+      </WishlistProvider>
     </QueryClientProvider>
   );
 }
