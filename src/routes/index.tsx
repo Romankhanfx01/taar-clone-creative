@@ -5,6 +5,8 @@ import { ProductCard } from "@/components/ProductCard";
 import { Marquee } from "@/components/Marquee";
 import { FeatureGrid } from "@/components/FeatureGrid";
 import { Reviews } from "@/components/Reviews";
+import { TrustBadges } from "@/components/TrustBadges";
+import { InstagramFeed } from "@/components/InstagramFeed";
 import { listProducts, listCollections } from "@/lib/products.functions";
 import bannerCharger from "@/assets/banner-charger.jpg";
 import bannerCable from "@/assets/banner-cable.jpg";
@@ -51,6 +53,7 @@ function Index() {
     <div>
       <HeroSlider />
       <Marquee items={["FREE SHIPPING OVER RS. 5,000","12-MONTH WARRANTY","GaN III TECHNOLOGY","7-DAY RETURNS","MADE FOR EVERYDAY"]} />
+      <TrustBadges />
 
       <section className="py-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-12">
@@ -119,6 +122,7 @@ function Index() {
       )}
 
       <Reviews />
+      <InstagramFeed />
     </div>
   );
 }

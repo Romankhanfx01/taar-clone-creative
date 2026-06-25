@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Search, User, ShoppingBag, Menu, X } from "lucide-react";
+import { Search, User, ShoppingBag, Menu, X, Heart } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "./Logo";
 import { useCart } from "@/lib/cart";
+import { useWishlist } from "@/lib/wishlist";
 
 const links = [
   { to: "/", label: "Home" },
@@ -14,6 +15,7 @@ const links = [
 
 export function Header() {
   const { count, setOpen } = useCart();
+  const { count: wishCount } = useWishlist();
   const [mobile, setMobile] = useState(false);
   const navigate = useNavigate();
 
@@ -44,6 +46,14 @@ export function Header() {
           <button aria-label="Search" onClick={() => navigate({ to: "/search", search: { q: "" } })} className="text-foreground/80 hover:text-mint transition">
             <Search className="h-5 w-5" />
           </button>
+          <Link to="/wishlist" aria-label="Wishlist" className="relative hidden sm:inline text-foreground/80 hover:text-mint transition">
+            <Heart className="h-5 w-5" />
+            {wishCount > 0 && (
+              <span className="absolute -top-2 -right-2 grid h-5 w-5 place-items-center rounded-full bg-mint text-[10px] font-bold text-mint-foreground">
+                {wishCount}
+              </span>
+            )}
+          </Link>
           <Link to="/account" aria-label="Account" className="hidden sm:inline text-foreground/80 hover:text-mint transition">
             <User className="h-5 w-5" />
           </Link>

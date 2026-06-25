@@ -1,6 +1,6 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { ProductCard } from "@/components/ProductCard";
+import { ProductGrid } from "@/components/ProductGrid";
 import { getCollection } from "@/lib/products.functions";
 
 const qo = (slug: string) =>
@@ -45,11 +45,8 @@ function CollectionPage() {
   return (
     <div className="mx-auto max-w-7xl px-6 py-16 lg:px-12">
       <p className="dotted-text font-display text-sm tracking-[0.3em] mb-2">COLLECTION</p>
-      <h1 className="font-display text-5xl md:text-7xl tracking-wide mb-3">{data.collection.name.toUpperCase()}</h1>
-      <p className="text-muted-foreground mb-12">{data.items.length} products</p>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {data.items.map((p) => <ProductCard key={p.slug} product={p} />)}
-      </div>
+      <h1 className="font-display text-5xl md:text-7xl tracking-wide mb-10">{data.collection.name.toUpperCase()}</h1>
+      <ProductGrid products={data.items} />
     </div>
   );
 }

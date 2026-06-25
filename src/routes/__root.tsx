@@ -12,10 +12,12 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { CartProvider } from "@/lib/cart";
+import { WishlistProvider } from "@/lib/wishlist";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { CartDrawer } from "@/components/CartDrawer";
+import { MobileBottomNav } from "@/components/MobileBottomNav";
 
 function NotFoundComponent() {
   return (
@@ -129,15 +131,18 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   return (
     <QueryClientProvider client={queryClient}>
-      <CartProvider>
-        <AnnouncementBar />
-        <Header />
-        <main className="min-h-[60vh]">
-          <Outlet />
-        </main>
-        <Footer />
-        <CartDrawer />
-      </CartProvider>
+      <WishlistProvider>
+        <CartProvider>
+          <AnnouncementBar />
+          <Header />
+          <main className="min-h-[60vh] pb-16 lg:pb-0">
+            <Outlet />
+          </main>
+          <Footer />
+          <CartDrawer />
+          <MobileBottomNav />
+        </CartProvider>
+      </WishlistProvider>
     </QueryClientProvider>
   );
 }

@@ -1,10 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { formatPrice, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
-import { Plus } from "lucide-react";
+import { useWishlist } from "@/lib/wishlist";
+import { Plus, Heart } from "lucide-react";
 
 export function ProductCard({ product }: { product: Product }) {
   const { add } = useCart();
+  const { has, toggle } = useWishlist();
+  const wished = has(product.slug);
   return (
     <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card transition hover:border-mint/40 hover:shadow-[var(--shadow-card)]">
       {product.badge && (
@@ -12,6 +15,13 @@ export function ProductCard({ product }: { product: Product }) {
           {product.badge}
         </span>
       )}
+      <button
+        onClick={() => toggle(product.slug)}
+        aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
+        className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full border border-border bg-background/80 backdrop-blur transition hover:border-mint"
+      >
+        <Heart className={`h-4 w-4 transition ${wished ? "fill-mint text-mint" : "text-foreground/70"}`} />
+      </button>
       <Link
         to="/products/$slug"
         params={{ slug: product.slug }}
