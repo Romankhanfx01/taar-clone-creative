@@ -35,7 +35,7 @@ export function MobileBottomNav() {
         )}
         WISHLIST
       </Link>
-      <button onClick={() => setOpen(true)} className={`${base} relative ${idle}`}>
+      <button onClick={() => setOpen(true)} aria-label={`Open cart, ${count} items`} className={`${base} relative ${idle}`}>
         <ShoppingCart className="h-5 w-5" />
         {count > 0 && (
           <span className="absolute right-3 top-1 grid h-4 w-4 place-items-center rounded-full bg-mint text-[9px] font-bold text-mint-foreground">
