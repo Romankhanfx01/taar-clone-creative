@@ -7,25 +7,24 @@ type Sort = "featured" | "price-asc" | "price-desc" | "name-asc";
 
 export function ProductGrid({ products }: { products: Product[] }) {
   const [sort, setSort] = useState<Sort>("featured");
-  const [inStockOnly, setInStockOnly] = useState(false);
   const [onSaleOnly, setOnSaleOnly] = useState(false);
 
   const prices = products.map((p) => p.price);
-  const min = Math.min(...prices, 0);
-  const max = Math.max(...prices, 10000);
+  const min = prices.length ? Math.min(...prices) : 0;
+  const max = prices.length ? Math.max(...prices) : 10000;
   const [maxPrice, setMaxPrice] = useState<number>(max);
 
   const filtered = useMemo(() => {
     let list = products.filter((p) => p.price <= maxPrice);
     if (onSaleOnly) list = list.filter((p) => p.oldPrice && p.oldPrice > p.price);
-    if (inStockOnly) list = list; // all in stock by default
     switch (sort) {
       case "price-asc": list = [...list].sort((a, b) => a.price - b.price); break;
       case "price-desc": list = [...list].sort((a, b) => b.price - a.price); break;
       case "name-asc": list = [...list].sort((a, b) => a.name.localeCompare(b.name)); break;
     }
     return list;
-  }, [products, sort, inStockOnly, onSaleOnly, maxPrice]);
+  }, [products, sort, onSaleOnly, maxPrice]);
+
 
   return (
     <>
