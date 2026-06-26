@@ -9,7 +9,7 @@ export function MobileBottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const isActive = (p: string) => (p === "/" ? pathname === "/" : pathname.startsWith(p));
-  const base = "flex flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium tracking-wide";
+  const base = "flex flex-col items-center justify-center gap-1 min-h-11 py-2 text-[10px] font-medium tracking-wide";
   const active = "text-mint";
   const idle = "text-foreground/70";
 
@@ -35,7 +35,7 @@ export function MobileBottomNav() {
         )}
         WISHLIST
       </Link>
-      <button onClick={() => setOpen(true)} className={`${base} relative ${idle}`}>
+      <button onClick={() => setOpen(true)} aria-label={`Open cart, ${count} items`} className={`${base} relative ${idle}`}>
         <ShoppingCart className="h-5 w-5" />
         {count > 0 && (
           <span className="absolute right-3 top-1 grid h-4 w-4 place-items-center rounded-full bg-mint text-[9px] font-bold text-mint-foreground">
