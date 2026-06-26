@@ -35,23 +35,22 @@ export function ProductGrid({ products }: { products: Product[] }) {
             <input type="checkbox" checked={onSaleOnly} onChange={(e) => setOnSaleOnly(e.target.checked)} className="accent-mint" />
             On sale
           </label>
-          <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={inStockOnly} onChange={(e) => setInStockOnly(e.target.checked)} className="accent-mint" />
-            In stock
-          </label>
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-muted-foreground">Max Rs.{maxPrice.toLocaleString()}</span>
+            <label htmlFor="max-price" className="text-muted-foreground">Max Rs.{maxPrice.toLocaleString()}</label>
             <input
+              id="max-price"
               type="range"
               min={min}
               max={max}
               step={100}
               value={maxPrice}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
+              aria-label="Maximum price filter"
               className="w-32 accent-mint"
             />
           </div>
         </div>
+
         <div className="flex items-center gap-2">
           <ArrowUpDown className="h-4 w-4 text-mint" />
           <select
