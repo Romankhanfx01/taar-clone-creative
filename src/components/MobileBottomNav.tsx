@@ -9,7 +9,7 @@ export function MobileBottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   const isActive = (p: string) => (p === "/" ? pathname === "/" : pathname.startsWith(p));
-  const base = "flex flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium tracking-wide";
+  const base = "flex flex-col items-center justify-center gap-1 min-h-11 py-2 text-[10px] font-medium tracking-wide";
   const active = "text-mint";
   const idle = "text-foreground/70";
 
